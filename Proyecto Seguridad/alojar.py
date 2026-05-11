@@ -5,14 +5,14 @@ Descripción:
 - Interfaz gráfica para crear/alojar un servidor
 
 Autores:
-- Aaron Xavier Burciaga Alcantar
-- Andreiy Montoya Navarro
-- Abelardo Andre Vega Romero
+ @author Aaron Burciaga - 262788
+ @author Brian Sandoval - 262741
+ @author Dayanara Peralta - 262695
+ @author María Valdez - 262775
 """
 
 """Importaciones"""
 import servidorTCP
-import servidorUDP
 import utilerias as util
 import tkinter as tk
 from tkinter import messagebox as mb
@@ -27,9 +27,7 @@ def verificacionProtocolo(protocolo):
     if protocolo == "TCP":
         protocolo_servidor = "TCP"
         return servidorTCP.iniciar
-    else:
-        protocolo_servidor = "UDP"
-        return servidorUDP.iniciar
+
     
 
 """Oculta el menú y muestra esta pantalla"""

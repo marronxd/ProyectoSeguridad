@@ -7,9 +7,10 @@ Interfaz gráfica del cliente con soporte para:
 ✔ Detección de usuarios conectados/desconectados
 
 Autores:
-- Aaron Xavier Burciaga Alcantar
-- Andreiy Montoya Navarro
-- Abelardo Andre Vega Romero
+ @author Aaron Burciaga - 262788
+ @author Brian Sandoval - 262741
+ @author Dayanara Peralta - 262695
+ @author María Valdez - 262775
 """
 
 import tkinter as tk
@@ -43,8 +44,6 @@ class ClienteChat:
         try:
             if self.protocolo == "TCP":
                 self._iniciar_tcp()
-            else:
-                self._iniciar_udp()
 
             self.ejecutando = True
             return True
@@ -96,8 +95,6 @@ class ClienteChat:
         try:
             if self.protocolo == "TCP":
                 self.socket.sendall(mensaje.encode(self.codigo))
-            else:
-                self.socket.sendto(mensaje.encode(self.codigo), (self.ip, self.puerto))
             return True
         except:
             return False
@@ -116,10 +113,6 @@ class ClienteChat:
                         if not datos:
                             break
                         mensaje = datos.decode(self.codigo)
-                    else:
-                        datos, _ = self.socket.recvfrom(1024)
-                        mensaje = datos.decode(self.codigo)
-
                     if mensaje:
                         callback(mensaje)
 
@@ -252,25 +245,18 @@ class VentanaChat:
             return
 
         comando_privado_tcp = "/p "
-        comando_privado_udp = "/privado "
 
         # Si es un mensaje privado, lo enviamos tal cual
-        if texto.startswith(comando_privado_tcp) or texto.startswith(comando_privado_udp):
+        if texto.startswith(comando_privado_tcp):
             if self.protocolo == "TCP":
                 import utilerias as util
                 paquete = f"({util.ahora()}) {self.nombre}: {texto}"
-            else: # UDP
-                paquete = texto
-
             self.cliente.enviar(paquete)
         # Si es un mensaje público, le añadimos el formato
         else:
             if self.protocolo == "TCP":
                 import utilerias as util
                 paquete = f"({util.ahora()}) {self.nombre}: {texto}"
-            else: # UDP
-                paquete = f"{self.nombre}: {texto}"
-
             self.cliente.enviar(paquete)
 
         self.campo_entrada.delete(0, tk.END)

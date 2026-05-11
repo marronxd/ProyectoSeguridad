@@ -10,9 +10,10 @@ Funcionamiento:
 - Si todo sale bien, llama al módulo chat.py con el respectivo protocolo
 
 Autores:
-- Aaron Xavier Burciaga Alcantar
-- Andreiy Montoya Navarro
-- Abelardo Andre Vega Romero
+ @author Aaron Burciaga - 262788
+ @author Brian Sandoval - 262741
+ @author Dayanara Peralta - 262695
+ @author María Valdez - 262775
 """
 
 """Importaciones"""

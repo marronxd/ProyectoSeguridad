@@ -9,9 +9,10 @@ Funcionamiento:
 - Captura la selección del usuario y pasa el protocolo elegido ('TCP' o 'UDP') a los módulos 'conectar.py' y 'alojar.py'.
 
 Autores:
-- Aaron Xavier Burciaga Alcantar
-- Andreiy Montoya Navarro
-- Abelardo Andre Vega Romero
+ @author Aaron Burciaga - 262788
+ @author Brian Sandoval - 262741
+ @author Dayanara Peralta - 262695
+ @author María Valdez - 262775
 """
 
 """Importaciones"""
@@ -20,6 +21,7 @@ import utilerias as util # Módulo de utilidades: funciones varias (validaciones
 import alojar # Módulo para el servidor: permite crear y alojar un servidor
 import tkinter as tk # Biblioteca principal de interfaz gráfica
 from tkinter import ttk # Necesario para usar el Combobox (lista desplegable de protocolos)
+import login
 
 """Crea el frame principal del menú y lo configura"""
 def crearFrame(ventana):
@@ -39,20 +41,20 @@ def crearFrame(ventana):
     frameProtocolo = tk.Frame(frameMenu, bg=util.colorFondo)
     frameProtocolo.pack(pady=10)
 
-    util.label(frameProtocolo, "Protocolo a usar:", 18)
+    util.label(frameProtocolo, "Chat funcionando con TCP", 18)
 
-    # Combobox de selección TCP/UDP
+    # Combobox de selección TCP. Ya no se meustra pero se quedó así por temas de funciones
     protocolo = ttk.Combobox(frameProtocolo, 
-                             values=["TCP", "UDP"], 
+                             values=["TCP"], 
                              state="readonly", # No permite escribir texto, solo seleccionar
                              width=10)
     protocolo.current(0)  # Establece "TCP" como valor por defecto (índice 0)
-    protocolo.pack(pady=5) # Muestra el Combobox
 
     # Botón para unirse (Cliente). Usa lambda para ejecutar la función al hacer clic.
     # Llama a 'conectar.mostrarFrame', pasando el protocolo seleccionado dinámicamente con 'protocolo.get()'.
     util.boton(frameMenu, "Unirse a un servidor", 
-               lambda: conectar.mostrarFrame(ventana, frameMenu, protocolo.get()))
+              lambda: conectar.mostrarFrame(ventana, frameMenu, protocolo.get()))
+ 
     
     # Botón para crear (Servidor). Llama a 'alojar.mostrarFrame', pasando el protocolo seleccionado.
     util.boton(frameMenu, "Crear un servidor", 
