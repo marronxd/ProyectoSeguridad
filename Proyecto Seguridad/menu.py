@@ -21,7 +21,8 @@ import utilerias as util # Módulo de utilidades: funciones varias (validaciones
 import alojar # Módulo para el servidor: permite crear y alojar un servidor
 import tkinter as tk # Biblioteca principal de interfaz gráfica
 from tkinter import ttk # Necesario para usar el Combobox (lista desplegable de protocolos)
-import login
+import login_gui
+import login_validacion as logVal
 
 """Crea el frame principal del menú y lo configura"""
 def crearFrame(ventana):
@@ -29,12 +30,7 @@ def crearFrame(ventana):
 
     util.label(frameMenu, "POTROCHAT", 40) # Muestra el título principal del programa
 
-    descripcion = (
-        "Este programa tiene la finalidad conectar varios dispositivos\n"
-        "mediante una interfaz amigable desarrollada en Python. El usuario\n"
-        "tiene la opción de elegir ser cliente (envíar mensajes) o servidor\n"
-        "(alojar mensajes), así como de manejar el protocolo que desee."
-    )
+    descripcion = f"Hola {logVal.USUARIO} bienvenido a GRINDER. Explora un mundo de posibilidades Homosexuales"
     util.label(frameMenu, descripcion, 15) # Muestra la descripción del programa
 
     # Frame contenedor para la etiqueta y el Combobox

@@ -20,13 +20,14 @@ import conectar #Pantalla para conectarse a un servidor
 import alojar #Pantalla para crear un servidor
 #import chat #Pantalla del chat
 import utilerias as util #Funciones varias
-import login
+import login_gui # interfaz de login
 
 ventana = tk.Tk() #Crea la ventana principal
 ventana.title("Menú de servicios") #Título de la ventana
 ventana.state("zoomed") #Pantalla completa
 ventana.configure(bg=util.colorFondo) #Color de fondo
 ventana.protocol("WM_DELETE_WINDOW", ventana.destroy) #Se puede con el botón x
+
 
 # Se creara el frame después de un login exitoso.
 frameMenu = None
@@ -40,7 +41,11 @@ def mostrarFrame(frameMostrar):
             frame.pack_forget()
     frameMostrar.pack(fill="both", expand=True)
 
-# Se llama tras un login exitoso. 
+    """
+    Se llama tras un login exitoso.
+    Crea los frames y se muestran
+
+    """
 def exito():
     global frameMenu, frameConectar, frameAlojar
     frameMenu = menu.crearFrame(ventana) #Crea la pantalla de menú
@@ -53,7 +58,15 @@ def exito():
     frameAlojar.mostrar = mostrarFrame
     mostrarFrame(frameMenu) # Muestra el menú después del login exitoso
 
-# Inicia el login
-login.abrirLogin(ventana, exito) 
+"""
+funcion para cerrar el sistema
+"""
+def cerrar_programa():
+    ventana.destroy()
 
+
+# Inicia el login
+login_gui.abrirLogin(ventana, exito) # manda mensaje de exito y lo reciben los metodos que ocupen
+
+login_gui.abrirLogin(ventana, exito)
 ventana.mainloop() #Bucle para que siga abierta la ventana

@@ -2,23 +2,21 @@ import tkinter as tk
 from tkinter import messagebox
 import menu #Pantalla de menú principal
 import utilerias as util
-import hashlib as hash
+import login_validacion as loginVal
 
 """
 Almacen de usuarios
 
+
+Autores:
+ @author Aaron Burciaga - 262788
+ @author Brian Sandoval - 262741
+ @author Dayanara Peralta - 262695
+ @author María Valdez - 262775
 """
 
-usuarios  = {
-    "aaron": "123",
-    "cachorrita123": "pato"
-    }
-
-
-
-
 """
-Crear el frame tipo dialogo que muestyre el inicio de sesion
+Crear el frame tipo dialogo que muestra el inicio de sesion
 
 """
 
@@ -46,26 +44,29 @@ def abrirLogin(ventana, exito):
     entrada_user = tk.Entry(ventana_login)
     entrada_user.pack(pady=5)
     
-    # para el campo de contrasenia
+    # para el campo de contraseña
     tk.Label(ventana_login, text="Contraseña:").pack(pady=(10, 0))
-    # show="*" para no mostrar la contrasenia
-    entrada_contra = tk.Entry(ventana_login, show="*") 
+    entrada_contra = tk.Entry(ventana_login, show="*") # show="*" para no mostrar la contrasenia
     entrada_contra.pack(pady=5)
     
+    ventana_login.protocol("WM_DELETE_WINDOW", ventana.destroy) # si se le da a la x, cierra todo el programa
 
 
+    """
+    Función que llama a un auxiliar para validar la identidad.
+
+    """
     def validar():
 
         # Extracción de la información de sus respectivos campos
         usuario = entrada_user.get()
         contrasenia = entrada_contra.get()
 
-        # Verificacion de las entradas
-        if usuario in usuarios: 
-            if usuarios[usuario] == contrasenia:
-                # Se destruye el login  y se avisa que fue un exito el inicio de sesión.
-                ventana_login.destroy()
-                exito()
+        # Verifica las entradas
+        if loginVal.validar_identidad(usuario, contrasenia):
+            # Se destruye el login  y se avisa que fue un exito el inicio de sesión.
+            ventana_login.destroy()
+            exito()
         else: 
             messagebox.showerror("Error.", "Fallo de autenticación.")
     btn_entrar = tk.Button(ventana_login, text="Entrar", command=lambda: validar())
