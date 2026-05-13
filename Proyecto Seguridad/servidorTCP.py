@@ -128,6 +128,7 @@ def manejar(cliente):
     Esta funcion gestiona los hilos y a su vez asigna cada hilo a un cliente, añade cada cliente
     tanto como su nombre a registros y da avisos
 """
+
 def recibir():
     global usuariosActivos, CAPACIDAD_MAXIMA
     while True:

@@ -21,16 +21,16 @@ import utilerias as util # Módulo de utilidades: funciones varias (validaciones
 import alojar # Módulo para el servidor: permite crear y alojar un servidor
 import tkinter as tk # Biblioteca principal de interfaz gráfica
 from tkinter import ttk # Necesario para usar el Combobox (lista desplegable de protocolos)
-import login_gui
+import login_gui 
 import login_validacion as logVal
 
 """Crea el frame principal del menú y lo configura"""
 def crearFrame(ventana):
     frameMenu = tk.Frame(ventana, bg=util.colorFondo) # Crea el contenedor principal (la pantalla) y le asigna el color de fondo
 
-    util.label(frameMenu, "POTROCHAT", 40) # Muestra el título principal del programa
+    util.label(frameMenu, "Grinder", 40) # Muestra el título principal del programa
 
-    descripcion = f"Hola {logVal.USUARIO} bienvenido a GRINDER. Explora un mundo de posibilidades Homosexuales"
+    descripcion = f"Hola {logVal.USUARIO} bienvenido a Grinder. Explora un mundo de posibilidades Homosexuales"
     util.label(frameMenu, descripcion, 15) # Muestra la descripción del programa
 
     # Frame contenedor para la etiqueta y el Combobox

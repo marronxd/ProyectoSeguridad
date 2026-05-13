@@ -24,7 +24,7 @@ Autores:
 import socket       # Conecta dispositivos mediante cliente-servidor
 import threading    # Ejecuta paralelamente
 import utilerias as util  # Funciones varias
-
+import encriptar  # modulo de encriptado y desencriptado
 
 """Encapsula todo en una función para llamarla desde menu.py"""
 def iniciar(mostrar_funcion):
@@ -54,12 +54,12 @@ def conectar(ip, puerto):
         cliente.settimeout(None)  # Restaura el timeout a infinito después de conectar
     return cliente
 
-
 """Recibe mensajes del servidor TCP"""
 def recibir(cliente, nombre, mostrar_funcion):
     while True:
         try:
-            texto = cliente.recv(1024).decode(util.codigo)  # Mensaje decodificado de 1024 bytes mediante ASCII
+            texto = cliente.recv(1024).decode(util.codigo)  # Mensaje decodificado de 1024 bytes mediante UTF_8
+            print(f"CLiente tcp recibir. texto: {texto}")
             if texto == "Nombre: ":  # El servidor pide el nombre al cliente
                 cliente.send(nombre.encode(util.codigo))
             else:
@@ -77,8 +77,9 @@ def recibir(cliente, nombre, mostrar_funcion):
 def escribir(cliente, nombre):
     while True:
         texto = input("")  # Contenido del mensaje
+        print(f"CLiente tcp escribir. texto: {texto}")
         mensaje = f"({util.ahora()}) {nombre}: {texto}"  # Mensaje con emisor y fecha
-        cliente.send(mensaje.encode(util.codigo))  # Codifica dicho mensaje con ASCII
+        cliente.send(mensaje.encode(util.codigo))  # Codifica dicho mensaje con utf-8
 
 
 """Inserta los métodos en hilos e inicia su funcionamiento con .start()"""

@@ -20,12 +20,12 @@ Autores:
 import utilerias as util # Funciones varias para validaciones y utilidades
 import tkinter as tk # Interfaz gráfica
 from tkinter import messagebox as mb # Ventanas con mensajes de advertencia y error
+import login_validacion as logVal # es para obtener el usuario
 
 # Variables de estado para compartir la conexión con otros módulos
 ip_servidor = None
 puerto_servidor = None
 nombre_usuario = None
-
 
 """Oculta el menú y muestra la pantalla de conectar"""
 def mostrarFrame(ventana, frameMenu, protocolo="TCP"):
@@ -57,19 +57,20 @@ def crearFrame(ventana, frameMenu, protocolo="TCP"):
 
     campoIP = util.frameInfo(framePrincipal, "Dirección IP del servidor", 18) # Pide IP
     campoPuerto = util.frameInfo(framePrincipal, "Puerto del servidor", 5) # Pide puerto
-    campoNombre = util.frameInfo(framePrincipal, "Nombre de usuario", 20) # Pide usuario
+
     """Método que maneja la ejecución cuando se presione el botón"""
     def clickConectarse():
         ip = campoIP.get()
         puerto = campoPuerto.get()
-        nombre = campoNombre.get()
-        if not ip or not puerto or not nombre: # Uno de los tres campos está vacío
+        nombre = "".join(logVal.USUARIO) # Lo recorre caracter por caracter hasta hacer otra vez el texto pq sino lo marca ambos como global
+        if not ip or not puerto: # Uno de los tres campos está vacío
             mb.showwarning("Campos vacíos", "Llene los campos solicitados")
             return
         
         if validar(ip, puerto): # Valida la dirección
             # Guardar valores para su uso en otros módulos
             global ip_servidor, puerto_servidor, nombre_usuario
+            
             ip_servidor = ip
             puerto_servidor = int(puerto)
             nombre_usuario = nombre

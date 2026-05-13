@@ -28,7 +28,6 @@ ventana.state("zoomed") #Pantalla completa
 ventana.configure(bg=util.colorFondo) #Color de fondo
 ventana.protocol("WM_DELETE_WINDOW", ventana.destroy) #Se puede con el botón x
 
-
 # Se creara el frame después de un login exitoso.
 frameMenu = None
 frameConectar = None
@@ -67,6 +66,4 @@ def cerrar_programa():
 
 # Inicia el login
 login_gui.abrirLogin(ventana, exito) # manda mensaje de exito y lo reciben los metodos que ocupen
-
-login_gui.abrirLogin(ventana, exito)
 ventana.mainloop() #Bucle para que siga abierta la ventana

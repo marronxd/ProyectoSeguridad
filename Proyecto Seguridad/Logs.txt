@@ -1,0 +1,5 @@
+2026-05-12 20:51:33,294 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesiï¿½n.
+2026-05-12 20:52:02,327 - WARNING - USUARIO: None | IP: 192.168.100.10 | Acceso con usuario inexistente
+2026-05-12 20:52:17,436 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
+2026-05-12 20:52:28,716 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesiï¿½n.
+2026-05-12 22:21:48,563 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.

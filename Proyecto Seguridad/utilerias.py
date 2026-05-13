@@ -24,6 +24,11 @@ Autores:
 import socket #Para ip()
 from datetime import datetime as dt #Para ahora()
 import tkinter as tk #Interfaz gráfica para wrappers
+import logging as log
+import login_validacion as logVal
+
+
+
 
 """Regresa un string con la fecha y hora"""
 def ahora():
@@ -60,8 +65,8 @@ def validarPuerto(puerto):
     )
 
 """Variables utilizadas en el programa"""
-colorFondo = "grey20"
-colorBotones = "grey10"
+colorFondo = "#001D39"
+colorBotones = "#0A4174"
 colorTexto = "white"
 fuente = "Arial"
 codigo = "utf-8"
@@ -110,9 +115,6 @@ def frameInfo(ventana, texto, caracteres):
     dato.pack(side="left", padx=caracteres)
     return dato
 
-
-
-
 ###
 """Métodos solo para terminal. Remover cuando se decida formalmente"""
 def pedirIp():
@@ -146,3 +148,27 @@ def pedirNombreChat(nombreUsuario):
         return nombreChat
 ### 
 
+
+
+""" Configuracion inicial de un log """
+
+log.basicConfig(level= log.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                filename='Logs.txt',
+                filemode='a'
+                )
+
+""" Metodo reutilizable para mandar logs"""
+def guardar_log(mensaje, tipo):
+    # sanitizar
+    tipo = str(tipo).lower().strip()
+    mensaje = f"USUARIO: {logVal.USUARIO} | IP: {ip()} | {mensaje}" 
+    # Caminos alternos
+    if(tipo == "info"):
+        log.info(mensaje)
+    elif(tipo == "error"):
+        log.error(mensaje)
+    elif(tipo == "warning"):
+        log.warning(mensaje)
+    else:
+        log.critical(mensaje)

@@ -59,11 +59,12 @@ def abrirLogin(ventana, exito):
     def validar():
 
         # Extracción de la información de sus respectivos campos
-        usuario = entrada_user.get()
-        contrasenia = entrada_contra.get()
+        usuario = entrada_user.get().strip()
+        contrasenia = entrada_contra.get().strip()
 
         # Verifica las entradas
         if loginVal.validar_identidad(usuario, contrasenia):
+            util.guardar_log("Exito de inicio de sesión.", "info")
             # Se destruye el login  y se avisa que fue un exito el inicio de sesión.
             ventana_login.destroy()
             exito()
