@@ -58,15 +58,34 @@ def conectar(ip, puerto):
 def recibir(cliente, nombre, mostrar_funcion):
     while True:
         try:
-            texto = cliente.recv(1024).decode(util.codigo)  # Mensaje decodificado de 1024 bytes mediante UTF_8
-            print(f"CLiente tcp recibir. texto: {texto}")
-            if texto == "Nombre: ":  # El servidor pide el nombre al cliente
+            paquete = cliente.recv(1024).decode(util.codigo)  # Mensaje decodificado de 1024 bytes mediante UTF_8
+            
+            #  Handshake inicial
+            # El servidor envia esto sin encriptar
+            if paquete == "Nombre: ":  # El servidor pide el nombre al cliente
                 cliente.send(nombre.encode(util.codigo))
             else:
-                if not texto:
+                if not paquete:
                     continue
                 else:
-                    mostrar_funcion(texto)  # *** USO DE LA FUNCIÓN PASADA COMO PARÁMETRO ***
+                    if ": " in paquete:
+                        try:
+                            # Cortamos en el ÚLTIMO ": " para obtener el mensaje encriptado
+                            # Usamos rsplit para asegurar que agarramos el contenido final
+                            prefijo, contenido_encriptado = paquete.rsplit(": ", 1)
+                            
+                            # Desencriptamos
+                            contenido_claro = encriptar.desencriptar(contenido_encriptado)
+                            
+                            texto_para_mostrar = f"{prefijo}: {contenido_claro}"
+                        except Exception:
+                            # Si falla (ej. mensaje del sistema no encriptado), mostramos original
+                            texto_para_mostrar = paquete
+                    else:
+                        # Mensajes directos del servidor sin formato ": "
+                        texto_para_mostrar = paquete
+                    print(f"recibir cliente tcp . Texto: {texto_para_mostrar}")
+                    mostrar_funcion(texto_para_mostrar)  # *** USO DE LA FUNCIÓN PASADA COMO PARÁMETRO ***
         except Exception as e:
             mostrar_funcion(f"Error: {e}")  # Usamos también la función para mostrar el error
             cliente.close()  # Si hay un error, cierra el cliente y rompe el bucle
@@ -77,9 +96,28 @@ def recibir(cliente, nombre, mostrar_funcion):
 def escribir(cliente, nombre):
     while True:
         texto = input("")  # Contenido del mensaje
-        print(f"CLiente tcp escribir. texto: {texto}")
-        mensaje = f"({util.ahora()}) {nombre}: {texto}"  # Mensaje con emisor y fecha
-        cliente.send(mensaje.encode(util.codigo))  # Codifica dicho mensaje con utf-8
+
+        if texto.startswith("/p "):
+
+            # Para mensaje privado
+
+            partes = texto.split(" ", 2)
+            destino = partes[1]
+            contenido = partes[2]
+
+            # se encripta solo el contenido
+            mensaje_encriptado = encriptar.encriptar(contenido)
+
+            # armado del paquete
+            paquete = f"/p|{destino}|({util.ahora()}) {nombre}: {mensaje_encriptado}"
+
+        else: # Mensajes públicos 
+            mensaje_encriptado = encriptar.encriptar(texto)
+
+            # armar paquete
+
+            paquete = f"/PUBLICO|TODOS|({util.ahora()}) {nombre}: {mensaje_encriptado}"  # Mensaje con emisor y fecha
+        cliente.send(paquete.encode(util.codigo))  # Codifica dicho mensaje con utf-8
 
 
 """Inserta los métodos en hilos e inicia su funcionamiento con .start()"""

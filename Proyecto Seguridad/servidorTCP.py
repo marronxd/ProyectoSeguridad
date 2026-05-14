@@ -52,7 +52,7 @@ codigo = "UTF-8"
 """
 Variable controladora de clientes activos en simultaneo
 """
-CAPACIDAD_MAXIMA = 6
+CAPACIDAD_MAXIMA = 1
 usuariosActivos = 0
 
 """
@@ -64,6 +64,7 @@ def iniciar(puerto=51225):
     servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # asigna una configuracion general al socket(socket.SOL_SOCKET), dicha config hace que otro cliente reutilice el puerto, el 1 es para activar
     servidor.bind(("0.0.0.0", puerto)) #Se conecta: IP (localhost en este caso), puerto (51225 por el 05/12/25). Parámetro de tupla
     servidor.listen() #Espera y atiende los clientes. Tiene una lista de espera en el SO
+    print("DEBUG: El socket está abierto y escuchando en 0.0.0.0") # <--- AÑADE ESTO
     print(f"Servidor iniciado en puerto {puerto}")
     print("Abre varias terminales y ejecuta cliente.py")
     recibir()
@@ -74,13 +75,14 @@ Itera en la lista de todos los participantes para enviarles el mensaje que un cl
 al resto de clientes en el server
 """
 def transmitir(mensaje):
-    for cliente in clientes: 
+    print(f"Debug ->  Transmitiendo a {len(clientes)} clientes: {mensaje[:50]}...")
+    for cliente in clientes[:]: 
         try:
             cliente.send(mensaje) #manda el mensaje de cada cliente
         except: #si un cliente es sacado por nombre repetido evita que truene
-            cliente.remove()
-            cliente.close()
-            
+           # cliente.remove()
+           # cliente.close()
+            pass
 
 
 """
@@ -88,38 +90,48 @@ Se encarga de manejar  el envio de mensajes a todo el grupo
 y a su vez se encarga de eliminar a participantes que abandonaron el chat
 """
 def manejar(cliente):
-    global usuariosActivos # evita variable local
+    global usuariosActivos
     while True:
-        try: # si el cliente está activo
-            mensaje = cliente.recv(1024) #El mensaje lo recibirá del cliente 
+        try:
+            mensaje = cliente.recv(1024)
             
-            #logica para mensajes privados
-            mensaje_str = mensaje.decode(codigo) #ya lo decodifique
+            if not mensaje:
+                break
+                
+            mensaje_str = mensaje.decode(codigo)
+            print(f"Mensaje recibido: {mensaje_str}")  # Debug
             
-            print("DEBUG mensaje =>", repr(mensaje))
-            partes = mensaje_str.split(" ", 5)
-            print("DEBUG partes =>", repr(partes))
-            print("DEBUG lista_nombres =>", repr(nombres))
-
-            if len(partes) > 3 and  partes[3] == "/p":
-                print("DEBUG entra a la condicion =>", repr(nombres))
-                mensaje_privado(cliente, partes)
+            # Verificar si es mensaje privado
+            if mensaje_str.startswith("/p|"):
+                partes = mensaje_str.split("|", 2)
+                if len(partes) == 3:
+                    tipo = partes[0]
+                    destino = partes[1]
+                    contenido = partes[2]
+                    mensaje_privado(cliente, destino, contenido)
                 continue
-
-            print(f"Mensaje: {mensaje_str}") # decodifica el mensaje para mostrarlo
-            transmitir(mensaje) # Envía el mensajee a cada miembro
-                #/p maria hola hola hola hola hola
-        except:  # si se desconecta
-            indice = clientes.index(cliente)  #saca la posicion del cliente (socket)
-            clientes.remove(cliente) # saca al cliente de la lista(socket)
-            cliente.close() #cierra el socket, para que el servidor no se comunique esa direccion
-            nombre = nombres[indice] #extrae el nombre en base al indice
-            transmitir(f"{nombre} dejó el chat".encode(codigo)) # envia el mensaje al server
-            nombres.remove(nombre) #elimina el nombre del cliente del registro
-            usuariosActivos -= 1 #disminiye la cantidad de usuarios activos
-            with condicion: #solo un hilo a la vez
-                condicion.notify() # notifica que el espacio queda disponible
-            break                  #despierta un cliente en espera
+            
+            # Mensaje público - retransmitir a TODOS los clientes
+            # IMPORTANTE: Enviar el mensaje original SIN MODIFICAR
+            transmitir(mensaje)  # Esto envía los bytes originales
+            
+        except Exception as e:
+            print(f"Error en manejar: {e}")
+            break
+    
+    # Limpiar al desconectarse
+    try:
+        indice = clientes.index(cliente)
+        clientes.remove(cliente)
+        cliente.close()
+        nombre = nombres[indice]
+        transmitir(f"{nombre} dejó el chat".encode(codigo))
+        nombres.remove(nombre)
+        usuariosActivos -= 1
+        with condicion:
+            condicion.notify()
+    except:
+        pass                 #despierta un cliente en espera
 
     
 
@@ -137,19 +149,38 @@ def recibir():
         
         print(f"Conectados con {str(direccion)}") #Muestra quién se conectó
         
-        cliente.send("Nombre".encode(codigo)) #codifica el nombre del cliente
-        texto  = cliente.recv(1024).decode(codigo) #decodifica el nombre del cliente
-        texto_partes = texto.split(" ", 5) #separa texto en partes
-        nombre = texto_partes[2].strip(":") # saca solo el nombre
+        cliente.send("Nombre: ".encode(codigo)) #codifica el nombre del cliente
+        respuesta = cliente.recv(1024).decode(codigo) #decodifica la respuesta del cliente
+
+        try:
+            # --- Lógica de extracción de nombre robusta ---
+            if "|" in respuesta:
+                # Si el cliente ya usa el nuevo formato de paquetes
+                partes = respuesta.split("|", 2)
+                nombre = partes[2].strip()
+            else:
+                # Si el cliente envía el nombre directo (Handshake simple)
+                nombre = respuesta.strip()
+            
+        except Exception as e:
+            print(f"Error al procesar nombre de {direccion}: {e}")
+            cliente.close()
+            continue
+
         if usuario_repetido(cliente, nombre):    #verifica si el nombre ya existe
             continue # ignora lo de abajo
         
         nombres.append(nombre) # agrega el nombre al registro de nombres
         clientes.append(cliente) # agrega al cliente al registro de clientes
         
-        
         print(f'El nombre del cliente es {nombre}')
-        transmitir(f'{nombre} se unió al chat'.encode(codigo))    
+
+        # aviso de que alguien se unió
+        transmitir(f'({util.ahora()}) SERVIDOR: {nombre} se unió al chat'.encode(codigo))   
+        
+        # Si tienes la función de log activa:
+        # util.guardar_log(f"{nombre} se unió al servidor", "info") 
+        
         cliente.send('Conectado al servidor ☻'.encode(codigo))
         
         # target indica la funcion que manejará el hilo
@@ -185,33 +216,37 @@ partes es el texto que recibe (ya decodificado) separado en partes
 
 en caso de haber excepcion ValueError, notifica al usuario
 """
-def mensaje_privado(cliente, partes):
-    print("DEBUG entra a mensaje privado", repr(nombres))
-    if len(partes) < 6:
-        print("DEBUG entra a condicion", repr(nombres))
-        cliente.send("Formato válido: /p nombre mensaje".encode(codigo))
-        return 
+def mensaje_privado(cliente, destino, contenido):
     try:
-        # Extraer remitente, destinatario y mensaje
-        remitente_nombre = partes[2].strip(":")
-        destinatario_nombre = partes[4]
-        mensaje_cuerpo = partes[5]
-
-        # Encontrar los sockets de ambos
-        indice_destino = nombres.index(destinatario_nombre)
-        cliente_destino = clientes[indice_destino]
-
-        # Construir dos mensajes: uno para el receptor y otro para el emisor
-        mensaje_para_receptor = f"(privado de {remitente_nombre}): {mensaje_cuerpo}".encode(codigo)
-        mensaje_para_emisor = f"(privado para {destinatario_nombre}): {mensaje_cuerpo}".encode(codigo)
-
-        # Enviar el mensaje correspondiente a cada uno
-        cliente_destino.send(mensaje_para_receptor)
-        cliente.send(mensaje_para_emisor)
-
-    except ValueError:
-        cliente.send(f"⚠️ ERROR. Nombre: {partes[4]} inexistente".encode(codigo))
-        return 
+        # Buscar el nombre del remitente usando el socket
+        if cliente not in clientes:
+            return
+        indice_remitente = clientes.index(cliente)  # ✅ Usar clientes, no nombres
+        nombre_remitente = nombres[indice_remitente]
+        
+        # Verificar si el destinatario existe
+        if destino not in nombres:
+            cliente.send(f"SISTEMA: El usuario '{destino}' no está conectado.".encode(codigo))
+            return
+        
+        # Obtener el socket del destinatario
+        indice_destino = nombres.index(destino)
+        socket_destino = clientes[indice_destino]  # ✅ Este es el socket real
+        
+        # Enviar mensaje al destinatario
+        mensaje_receptor = f"(privado de {nombre_remitente}): {contenido}".encode(codigo)
+        socket_destino.send(mensaje_receptor)
+        
+        # Enviar confirmación al remitente
+        mensaje_emisor = f"(privado para {destino}): {contenido}".encode(codigo)
+        cliente.send(mensaje_emisor)
+        
+    except Exception as e:
+        print(f"Error en mensaje_privado: {e}")
+        try:
+            cliente.send(f"SISTEMA: Error al enviar mensaje privado".encode(codigo))
+        except:
+            pass
     
 
 """

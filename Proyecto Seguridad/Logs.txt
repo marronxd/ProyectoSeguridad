@@ -3,3 +3,31 @@
 2026-05-12 20:52:17,436 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
 2026-05-12 20:52:28,716 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesiï¿½n.
 2026-05-12 22:21:48,563 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-12 22:27:53,878 - INFO - USUARIO: aaron | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-12 22:28:40,486 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-12 22:53:13,206 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-12 22:58:26,696 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-12 23:14:48,444 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-12 23:23:25,952 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 11:21:41,277 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 11:23:24,995 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:00:47,301 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:05:10,650 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:24:19,211 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:32:19,091 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:36:54,091 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:44:18,160 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:46:11,005 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:54:18,307 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 13:59:44,254 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 14:18:11,852 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 14:32:02,823 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 14:36:16,391 - WARNING - USUARIO: None | IP: 10.177.5.170 | Acceso con usuario inexistente
+2026-05-13 14:36:22,343 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 14:40:17,349 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 14:51:16,183 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 15:13:20,799 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 15:15:13,655 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 15:27:38,708 - INFO - USUARIO: menchaca | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-13 19:29:33,486 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
+2026-05-13 19:29:37,262 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.

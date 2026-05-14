@@ -18,7 +18,8 @@ la contraseña el valor
 """
 usuarios  = {
     "aaron": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
-    "cachorrita123": "3c98379477063f2762283023e3f495570853f6696b9968a3560b3706080b0373"
+    "cachorrita123": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+    "per": "586acb3c6bac489308c0938f762da702573a714dfdf3a729dcb40758b4c363ae"
     }
 
 # la declaramos

@@ -17,7 +17,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
 import socket
-
+import encriptar
+import utilerias as util
 
 class ClienteChat:
     """
@@ -44,12 +45,14 @@ class ClienteChat:
         try:
             if self.protocolo == "TCP":
                 self._iniciar_tcp()
-
+            # elif self.protocolo == "UDP":  # Si tienes UDP después
+            #     self._iniciar_udp()
+            
             self.ejecutando = True
             return True
         except Exception as e:
             print(f"Error al iniciar cliente: {e}")
-            return False
+            raise e  # Relanzar la excepción para que la capture el llamador
 
     def _iniciar_tcp(self):
         """
@@ -62,23 +65,26 @@ class ClienteChat:
         self.socket.settimeout(None)
 
         try:
+            # PRIMERO: Esperar a que el servidor pida el nombre
             datos = self.socket.recv(1024).decode(self.codigo)
-            if "nombre" in datos.lower():
-                #self.socket.sendall(self.nombre.encode(self.codigo))
-                # El servidor TCP espera un formato específico: "(fecha) nombre: mensaje"
-                # Para que el servidor pueda extraer el nombre, simulamos ese formato.
-                mensaje_nombre = f"dummy dummy {self.nombre}:"
-                self.socket.sendall(mensaje_nombre.encode(self.codigo))
-
-                # Esperamos la respuesta del servidor para saber si el nombre fue aceptado.
+            print(f"DEBUG - Servidor dice: {datos}")  # Para debug
+            
+            # SEGUNDO: Enviar el nombre cuando el servidor lo pida
+            if "Nombre:" in datos or "nombre" in datos.lower():
+                self.socket.sendall(self.nombre.encode(self.codigo))
+                print(f"DEBUG - Nombre enviado: {self.nombre}")
+                
+                # TERCERO: Esperar respuesta del servidor
                 respuesta_servidor = self.socket.recv(1024).decode(self.codigo)
+                print(f"DEBUG - Respuesta servidor: {respuesta_servidor}")
+                
                 if "nombre en uso" in respuesta_servidor.lower():
                     self.socket.close()
-                    # Lanzamos una excepción para que sea capturada y mostrada al usuario.
                     raise ConnectionRefusedError(respuesta_servidor)
-
-        except:
-            raise # Re-lanzamos la excepción para que el código que llamó a iniciar() la maneje.
+        except socket.timeout:
+            raise Exception("Timeout: El servidor no respondió")
+        except Exception as e:
+            raise  # Re-lanzamos la excepción para que el código que llamó a iniciar() la maneje.
 
     def _iniciar_udp(self):
         """
@@ -113,12 +119,20 @@ class ClienteChat:
                         if not datos:
                             break
                         mensaje = datos.decode(self.codigo)
-                    if mensaje:
-                        callback(mensaje)
-
-                except:
+                        print(f"DEBUG - Mensaje recibido (crudo): {repr(mensaje)}")  # Debug
+                        
+                        # El servidor podría enviar múltiples mensajes juntos
+                        # Separar por saltos de línea si existen
+                        if '\n' in mensaje:
+                            for msg in mensaje.split('\n'):
+                                if msg.strip():
+                                    callback(msg.strip())
+                        else:
+                            callback(mensaje)
+                            
+                except Exception as e:
+                    print(f"Error en bucle_recibir: {e}")
                     break
-
         finally:
             self.ejecutando = False
 
@@ -213,8 +227,13 @@ class VentanaChat:
         """
         self.cliente = ClienteChat(self.protocolo, self.ip, self.puerto)
 
-        if not self.cliente.iniciar(self.nombre):
-            messagebox.showerror("Error", "No se pudo conectar al servidor")
+        try:
+            if not self.cliente.iniciar(self.nombre):
+                messagebox.showerror("Error", "No se pudo conectar al servidor")
+                self.ventana_chat.destroy()
+                return False
+        except Exception as e:
+            messagebox.showerror("Error de conexión", str(e))
             self.ventana_chat.destroy()
             return False
 
@@ -244,19 +263,21 @@ class VentanaChat:
         if not texto:
             return
 
-        comando_privado_tcp = "/p "
-
-        # Si es un mensaje privado, lo enviamos tal cual
-        if texto.startswith(comando_privado_tcp):
-            if self.protocolo == "TCP":
-                import utilerias as util
-                paquete = f"({util.ahora()}) {self.nombre}: {texto}"
-            self.cliente.enviar(paquete)
-        # Si es un mensaje público, le añadimos el formato
+        if texto.startswith("/p "):
+            # Mensaje privado
+            partes = texto.split(" ", 2)
+            if len(partes) == 3:
+                destino = partes[1]
+                contenido = partes[2]
+                mensaje_encriptado = encriptar.encriptar(contenido)
+                # Formato que espera el servidor TCP
+                paquete = f"/p|{destino}|({util.ahora()}) {self.nombre}: {mensaje_encriptado}"
+                self.cliente.enviar(paquete)
         else:
-            if self.protocolo == "TCP":
-                import utilerias as util
-                paquete = f"({util.ahora()}) {self.nombre}: {texto}"
+            # Mensaje público
+            mensaje_encriptado = encriptar.encriptar(texto)
+            # Formato que espera el servidor TCP
+            paquete = f"/PUBLICO|TODOS|({util.ahora()}) {self.nombre}: {mensaje_encriptado}"
             self.cliente.enviar(paquete)
 
         self.campo_entrada.delete(0, tk.END)
@@ -271,55 +292,89 @@ class VentanaChat:
     def _procesar_mensaje_en_ui(self, texto):
         """
         Se ejecuta en el hilo de la GUI.
-        Parsea el texto del mensaje entrante para determinar su tipo (privado,
-        público, sistema, etc.) y llama a la función de visualización correspondiente.
         """
-        # Mensaje privado (TCP y UDP)
+        print(f"DEBUG UI - Procesando: '{texto}'")
+        
+        # Manejar mensajes con formato /PUBLICO|... o /PRIVADO|...
+        if texto.startswith("/PUBLICO|") or texto.startswith("/p|"):
+            try:
+                partes = texto.split("|", 2)
+                if len(partes) == 3:
+                    tipo = partes[0]  # /PUBLICO o /PRIVADO
+                    destino = partes[1]  # TODOS o nombre destino
+                    contenido = partes[2]  # (fecha) nombre: mensaje_encriptado
+                    
+                    # Extraer el mensaje encriptado
+                    if ": " in contenido:
+                        # Separar el prefijo (fecha) nombre: del mensaje encriptado
+                        prefijo, encriptado = contenido.rsplit(": ", 1)
+                        
+                        try:
+                            # Desencriptar el mensaje
+                            desencriptado = encriptar.desencriptar(encriptado)
+                            texto_mostrar = f"{prefijo}: {desencriptado}"
+                            
+                            # Mostrar como mensaje público normal
+                            if "SERVIDOR" in prefijo:
+                                self.mostrar_mensaje_sistema(desencriptado)
+                            else:
+                                # Extraer nombre del remitente
+                                nombre_partes = prefijo.split(" ")
+                                nombre = nombre_partes[-1] if nombre_partes else "Usuario"
+                                self.mostrar_mensaje(nombre, desencriptado, 
+                                                es_propio=(nombre == self.nombre))
+                            return
+                        except Exception as e:
+                            print(f"Error al desencriptar: {e}")
+                            self.mostrar_mensaje_sistema(contenido)
+                            return
+            except Exception as e:
+                print(f"Error al procesar mensaje con pipe: {e}")
+                self.mostrar_mensaje_sistema(texto)
+                return
+        
+        # Mensaje privado (formato original sin pipes)
         if texto.startswith("(privado de") or texto.startswith("(privado para"):
             try:
-                partes = texto.split(":", 1)
-                info = partes[0] # (privado de/para Nombre)
-                mensaje = partes[1].strip()
-
-                # Mensaje recibido de otro usuario
+                # Extraer info y el resto
+                info, resto = texto.split(":", 1)
+                resto = resto.strip()
+                
+                # Buscar el ÚLTIMO ": " para separar el mensaje encriptado
+                if ": " in resto:
+                    ultimo_dos_puntos = resto.rfind(": ")
+                    prefijo = resto[:ultimo_dos_puntos]
+                    encriptado = resto[ultimo_dos_puntos + 2:]
+                    
+                    # Desencriptar
+                    try:
+                        desencriptado = encriptar.desencriptar(encriptado)
+                        mensaje_final = f"{prefijo}: {desencriptado}"
+                    except:
+                        mensaje_final = resto
+                else:
+                    mensaje_final = resto
+                
                 if info.startswith("(privado de"):
                     remitente = info.split(" ")[2].strip(")")
-                    self.mostrar_mensaje(remitente, f"→ {mensaje}", es_privado=True)
-                
-                # Confirmación de nuestro mensaje enviado
-                else: # (privado para)
+                    # Mostrar solo el mensaje desencriptado
+                    self.mostrar_mensaje(remitente, f"→ {desencriptado}", es_privado=True)
+                else:
                     destinatario = info.split(" ")[2].strip(")")
-                    self.mostrar_mensaje(self.nombre, f"→ {destinatario}: {mensaje}", es_propio=True, es_privado=True)
+                    self.mostrar_mensaje(self.nombre, f"→ {destinatario}: {desencriptado}", 
+                                    es_propio=True, es_privado=True)
+                return
+            except Exception as e:
+                print(f"Error: {e}")
+                self.mostrar_mensaje_sistema(texto)
+                return
 
-            except Exception:
-                self.mostrar_mensaje_sistema(texto) # Si el formato es inesperado, lo muestra como sistema
+        # Mensaje del sistema (sin formato especial)
+        if "se unió al chat" in texto or "dejó el chat" in texto:
+            self.mostrar_mensaje_sistema(texto)
             return
 
-        # Nuevo usuario
-        if "se unió al chat" in texto:
-            nombre = texto.split()[0]
-            self.mostrar_mensaje_sistema(f"{nombre} se unió")
-            return
-
-        # Público
-        if ":" in texto:
-            # El formato del servidor TCP es: (fecha) nombre: mensaje
-            # El formato del servidor UDP es: nombre: mensaje
-            partes = texto.split(":", 1)
-            remitente_info = partes[0]
-            contenido = partes[1].strip()
-
-            # Extraemos solo el nombre del remitente, que es la última "palabra" antes de los dos puntos.
-            remitente = remitente_info.split()[-1].strip(":")
-
-            # Si el mensaje es público (no es un comando de MP de TCP), lo mostramos
-            if not contenido.startswith("/p"):
-                self.mostrar_mensaje(
-                    remitente, contenido, es_propio=(remitente == self.nombre)
-                )
-            return  # Ya procesamos el mensaje, salimos de la función
-
-        # Mensajes del sistema
+        # Cualquier otro mensaje
         self.mostrar_mensaje_sistema(texto)
 
     def mostrar_mensaje_sistema(self, mensaje):
