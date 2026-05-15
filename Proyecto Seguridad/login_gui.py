@@ -64,7 +64,7 @@ def abrirLogin(ventana, exito):
 
         # Verifica las entradas
         if loginVal.validar_identidad(usuario, contrasenia):
-            util.guardar_log("Exito de inicio de sesión.", "info")
+            util.guardar_log("Éxito de inicio de sesión.", "info")
             # Se destruye el login  y se avisa que fue un exito el inicio de sesión.
             ventana_login.destroy()
             exito()

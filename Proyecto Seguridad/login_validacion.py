@@ -19,7 +19,9 @@ la contraseña el valor
 usuarios  = {
     "aaron": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
     "cachorrita123": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
-    "per": "586acb3c6bac489308c0938f762da702573a714dfdf3a729dcb40758b4c363ae"
+    "Brian": "f3fe5a51a2be8c6dc715028858fcba82ee021be7687e4f95b45086b8ffb1a23f",
+    "Dayanara": "944c27e5b97ab7793e4b6e9ff29384890ece0c7c04d2e2bf81c5f763469cc66b",
+    "Maria": "6d1770695e81c6e1107cd5eed4954828f52abba7c830059edf16926b73d66bd2"
     }
 
 # la declaramos
@@ -48,7 +50,7 @@ def validar_identidad (usuario, contrasenia):
 
 
 # se añadira para registrar usuario
-""" funcion para validar el formato de la contraseña"""
+""" función para validar el formato de la contraseña"""
 def validar_formato(contrasenia):
     # patron que debe seguir la contrasenia
     patron = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"

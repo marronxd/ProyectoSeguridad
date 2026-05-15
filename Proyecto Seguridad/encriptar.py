@@ -1,9 +1,14 @@
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-import base64
+
+
+"""Librerias para ejecutar la descarga"""
+import subprocess
+import sys
+
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
 
 """
-Modulo que encripta y descencripta con AES-128 
+Modulo que encripta y descencripta con RSA-128 
 
 Autores:
  @author Aaron Burciaga - 262788
@@ -13,34 +18,66 @@ Autores:
 
 """
 
-# Auxiliares para encriptado y desencriptado
-# La llave debe ser de 16 bytes para AES-128
-LLAVE = b'PotrosItson12345' # 16 caracteres exactos
-BLOCK_SIZE = 16
 FORMATO = "utf-8"
 
-def encriptar(mensaje):
-    # 1.- Crear el objeto cifrador
-    # COnfigura  el encriptado usando algoritmo AES con la llave y  reglas ECB
-    # divide el texto en bloques de 16 bytes y los encripta independiente   
-    cifrador = AES.new(LLAVE, AES.MODE_ECB)
+"""
+ Generar las llaves publica y privada por cada cliente que abra el chat. Solo la primera vez
+ """
+def generar_llaves():
+    llave_privada = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048
+    )
+    llave_publica = llave_privada.public_key()
+    return llave_privada, llave_publica
 
-    # 2.- Rellenar los bloques de 16 bytes y encriptar
-    mensaje_relleno = pad(mensaje.encode(FORMATO), BLOCK_SIZE)
-    mensaje_encriptado = cifrador.encrypt(mensaje_relleno) # encriptar
+"""Encripta para envio. Requiere la llave publica para poder descifrar el mensaje"""
 
-    # 3.- Transportarlo con base64 para que no se corrompa  en el transporte
-    return base64.b64encode(mensaje_encriptado).decode(FORMATO)
+def encriptar(mensaje, llave_publica_receptor):
+    return llave_publica_receptor.encrypt(
+        mensaje.encode(FORMATO), #convertir a cadnea de bits
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()), # padding para que no sea determinista.  el MGF1 revuelve los bits para que no pueda ser predecible
+            algorithm=hashes.SHA256(), # por si se llegase a modificar, ya no es el mismo hash
+            label=None
+        )
+    )
 
-def desencriptar(mensaje_encriptadob64):
-    # 1.- Convertir de base64 a bytes encriptados
-    mensaje_encriptado = base64.b64decode(mensaje_encriptadob64)
+"""Desencripta el mensaje que se recibe. Requiere la llave privada para desbloquearlo"""
+def desencriptar(mensaje_cifrado, llave_privada_propia):
+    return llave_privada_propia.decrypt(
+        mensaje_cifrado,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    ).decode(FORMATO)
 
-    # 2.- Crear el descifrador
-    descifrador = AES.new(LLAVE, AES.MODE_ECB)
 
-    # 3.- descencriotar  y removerle el relleno q le metió
-    mensaje_relleno = descifrador.decrypt(mensaje_encriptado)
-    mensaje_final = unpad(mensaje_relleno, BLOCK_SIZE)
 
-    return mensaje_final.decode(FORMATO)
+
+
+
+
+
+
+
+"""AUxiliar para descargar la libreria de encriptado"""
+def instalar_dependencias():
+    try:
+        # Intentamos importar la librería
+        import cryptography
+        print("Librería 'cryptography' ya está instalada.")
+    except ImportError:
+        # Si no existe, Python ejecuta el comando de instalación
+        print("Instalando la librería 'cryptography' necesaria para RSA...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "cryptography"])
+        print("Instalación completada con éxito.")
+
+# Llamamos a la función antes de cualquier otra cosa
+instalar_dependencias()
+
+
+if __name__ == "__main__":
+    instalar_dependencias()

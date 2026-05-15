@@ -170,5 +170,7 @@ def guardar_log(mensaje, tipo):
         log.error(mensaje)
     elif(tipo == "warning"):
         log.warning(mensaje)
+    elif(tipo == "debug"):
+        log.debug(mensaje)
     else:
         log.critical(mensaje)

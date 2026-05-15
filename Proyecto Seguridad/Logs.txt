@@ -29,5 +29,52 @@
 2026-05-13 15:13:20,799 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
 2026-05-13 15:15:13,655 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
 2026-05-13 15:27:38,708 - INFO - USUARIO: menchaca | IP: 10.177.5.170 | Exito de inicio de sesión.
-2026-05-13 19:29:33,486 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
-2026-05-13 19:29:37,262 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 19:24:33,774 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 19:33:16,316 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 19:35:44,248 - INFO - USUARIO: aaron | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 21:08:12,666 - WARNING - USUARIO: None | IP: 192.168.100.2 | Contrasenia incorrecta
+2026-05-13 21:08:17,467 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 21:10:46,353 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 21:15:07,720 - WARNING - USUARIO: None | IP: 192.168.100.2 | Acceso con usuario inexistente
+2026-05-13 21:15:12,323 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 21:22:00,841 - INFO - USUARIO: aaron | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-13 21:30:16,871 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 21:39:37,390 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 21:50:39,268 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 22:01:47,206 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 22:12:15,076 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-13 22:26:07,871 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 08:46:17,080 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 08:56:05,947 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 09:00:30,854 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 09:04:43,068 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 09:17:19,285 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 09:25:32,849 - INFO - USUARIO: aaron | IP: 10.177.5.170 | Exito de inicio de sesión.
+2026-05-14 16:05:21,512 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:06:08,797 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
+2026-05-14 16:06:11,957 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 16:24:06,335 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:27:58,551 - WARNING - USUARIO: None | IP: 192.168.100.2 | Acceso con usuario inexistente
+2026-05-14 16:28:01,694 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:34:50,603 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:39:58,592 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 16:45:30,666 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:49:39,115 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 16:50:05,876 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:00:33,052 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 17:06:12,878 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 17:10:31,287 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 17:17:45,244 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 17:10:59,895 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:18:18,011 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:26:49,378 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:34:51,829 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:42:29,194 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:43:24,142 - INFO - USUARIO: cachorrita123 | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:44:10,216 - WARNING - USUARIO: None | IP: 192.168.100.10 | Contrasenia incorrecta
+2026-05-14 17:44:16,122 - INFO - USUARIO: per | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 17:49:19,321 - INFO - USUARIO: per | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 18:05:51,096 - INFO - USUARIO: per | IP: 192.168.100.2 | Exito de inicio de sesión.
+2026-05-14 18:11:38,750 - INFO - USUARIO: aaron | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 18:14:12,390 - INFO - USUARIO: per | IP: 192.168.100.10 | Exito de inicio de sesión.
+2026-05-14 18:30:00,627 - INFO - USUARIO: per | IP: 192.168.100.2 | Exito de inicio de sesión.

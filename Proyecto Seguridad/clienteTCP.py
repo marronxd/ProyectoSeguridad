@@ -25,6 +25,7 @@ import socket       # Conecta dispositivos mediante cliente-servidor
 import threading    # Ejecuta paralelamente
 import utilerias as util  # Funciones varias
 import encriptar  # modulo de encriptado y desencriptado
+from cryptography.hazmat.primitives import serialization
 
 """Encapsula todo en una función para llamarla desde menu.py"""
 def iniciar(mostrar_funcion):
@@ -32,7 +33,14 @@ def iniciar(mostrar_funcion):
     puerto = util.pedirPuerto()
     nombre = util.pedirNombre()
     cliente = conectar(ip, puerto)  # Establece la conexión con el servidor
-    hilosCliente(recibir, escribir, cliente, nombre, mostrar_funcion)  # Llama la función que ejecuta hilos
+    
+    # Generar llaves propias
+    llave_privada, llave_publica = encriptar.generar_llaves()
+    
+    # Handshake
+    handshake(cliente, nombre, llave_publica)
+    
+    hilosCliente(recibir, escribir, cliente, nombre, mostrar_funcion, llave_privada)  # Llama la función que ejecuta hilos
     return cliente
 
 
@@ -54,38 +62,54 @@ def conectar(ip, puerto):
         cliente.settimeout(None)  # Restaura el timeout a infinito después de conectar
     return cliente
 
+"""Realiza el handshake inicial con el servidor"""
+def handshake(cliente, nombre, llave_publica):
+    # Recibir llave pública del servidor
+    llave_publica_servidor_bytes = cliente.recv(4096)
+    llave_publica_servidor = serialization.load_pem_public_key(llave_publica_servidor_bytes)
+    
+    # Recibir "Nombre: "
+    paquete = cliente.recv(4096).decode(util.codigo)
+    if paquete == "Nombre: ":
+        cliente.send(nombre.encode(util.codigo))
+    
+    # Recibir "Llave: "
+    paquete = cliente.recv(4096).decode(util.codigo)
+    if paquete == "Llave: ":
+        llave_publica_serializada = llave_publica.public_key_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        cliente.send(llave_publica_serializada)
+    
+    # Aquí podría recibir llaves de otros clientes, pero por simplicidad, omitir
+
 """Recibe mensajes del servidor TCP"""
-def recibir(cliente, nombre, mostrar_funcion):
+def recibir(cliente, nombre, mostrar_funcion, llave_privada):
     while True:
         try:
-            paquete = cliente.recv(1024).decode(util.codigo)  # Mensaje decodificado de 1024 bytes mediante UTF_8
+            paquete = cliente.recv(4096).decode(util.codigo)  # Mensaje decodificado
             
-            #  Handshake inicial
-            # El servidor envia esto sin encriptar
-            if paquete == "Nombre: ":  # El servidor pide el nombre al cliente
-                cliente.send(nombre.encode(util.codigo))
+            if not paquete:
+                continue
             else:
-                if not paquete:
-                    continue
-                else:
-                    if ": " in paquete:
-                        try:
-                            # Cortamos en el ÚLTIMO ": " para obtener el mensaje encriptado
-                            # Usamos rsplit para asegurar que agarramos el contenido final
-                            prefijo, contenido_encriptado = paquete.rsplit(": ", 1)
-                            
-                            # Desencriptamos
-                            contenido_claro = encriptar.desencriptar(contenido_encriptado)
-                            
-                            texto_para_mostrar = f"{prefijo}: {contenido_claro}"
-                        except Exception:
-                            # Si falla (ej. mensaje del sistema no encriptado), mostramos original
-                            texto_para_mostrar = paquete
-                    else:
-                        # Mensajes directos del servidor sin formato ": "
+                if ": " in paquete:
+                    try:
+                        # Cortamos en el ÚLTIMO ": " para obtener el mensaje encriptado
+                        prefijo, contenido_encriptado = paquete.rsplit(": ", 1)
+                        
+                        # Desencriptamos
+                        contenido_claro = encriptar.desencriptar(contenido_encriptado.encode(util.codigo), llave_privada)
+                        
+                        texto_para_mostrar = f"{prefijo}: {contenido_claro}"
+                    except Exception:
+                        # Si falla (ej. mensaje del sistema no encriptado), mostramos original
                         texto_para_mostrar = paquete
-                    print(f"recibir cliente tcp . Texto: {texto_para_mostrar}")
-                    mostrar_funcion(texto_para_mostrar)  # *** USO DE LA FUNCIÓN PASADA COMO PARÁMETRO ***
+                else:
+                    # Mensajes directos del servidor sin formato ": "
+                    texto_para_mostrar = paquete
+                print(f"recibir cliente tcp . Texto: {texto_para_mostrar}")
+                mostrar_funcion(texto_para_mostrar)  # *** USO DE LA FUNCIÓN PASADA COMO PARÁMETRO ***
         except Exception as e:
             mostrar_funcion(f"Error: {e}")  # Usamos también la función para mostrar el error
             cliente.close()  # Si hay un error, cierra el cliente y rompe el bucle
@@ -93,7 +117,7 @@ def recibir(cliente, nombre, mostrar_funcion):
 
 
 """Envía mensajes al servidor TCP"""
-def escribir(cliente, nombre):
+def escribir(cliente, nombre, llave_publica_servidor):
     while True:
         texto = input("")  # Contenido del mensaje
 
@@ -106,13 +130,13 @@ def escribir(cliente, nombre):
             contenido = partes[2]
 
             # se encripta solo el contenido
-            mensaje_encriptado = encriptar.encriptar(contenido)
+            mensaje_encriptado = encriptar.encriptar(contenido, llave_publica_servidor)
 
             # armado del paquete
             paquete = f"/p|{destino}|({util.ahora()}) {nombre}: {mensaje_encriptado}"
 
         else: # Mensajes públicos 
-            mensaje_encriptado = encriptar.encriptar(texto)
+            mensaje_encriptado = encriptar.encriptar(texto, llave_publica_servidor)
 
             # armar paquete
 
@@ -121,10 +145,10 @@ def escribir(cliente, nombre):
 
 
 """Inserta los métodos en hilos e inicia su funcionamiento con .start()"""
-def hilosCliente(recibir, escribir, cliente, nombre, mostrar_funcion):
+def hilosCliente(recibir, escribir, cliente, nombre, mostrar_funcion, llave_privada, llave_publica_servidor):
     # Se agrega 'mostrar_funcion' a los argumentos de 'recibir'
-    threading.Thread(target=recibir, args=(cliente, nombre, mostrar_funcion)).start()
-    threading.Thread(target=escribir, args=(cliente, nombre)).start()
+    threading.Thread(target=recibir, args=(cliente, nombre, mostrar_funcion, llave_privada)).start()
+    threading.Thread(target=escribir, args=(cliente, nombre, llave_publica_servidor)).start()
 
 
 # NOTA: La llamada final a iniciar() DEBE ser modificada por el usuario al usar este archivo.
