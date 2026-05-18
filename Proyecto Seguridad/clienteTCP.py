@@ -129,16 +129,16 @@ def escribir(cliente, nombre, llave_publica_servidor):
             destino = partes[1]
             contenido = partes[2]
 
-            # se encripta solo el contenido
+            # Se encripta solo el contenido
             mensaje_encriptado = encriptar.encriptar(contenido, llave_publica_servidor)
 
-            # armado del paquete
+            # Armado del paquete
             paquete = f"/p|{destino}|({util.ahora()}) {nombre}: {mensaje_encriptado}"
 
         else: # Mensajes públicos 
             mensaje_encriptado = encriptar.encriptar(texto, llave_publica_servidor)
 
-            # armar paquete
+            # Armar paquete
 
             paquete = f"/PUBLICO|TODOS|({util.ahora()}) {nombre}: {mensaje_encriptado}"  # Mensaje con emisor y fecha
         cliente.send(paquete.encode(util.codigo))  # Codifica dicho mensaje con utf-8

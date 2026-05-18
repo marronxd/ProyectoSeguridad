@@ -1,0 +1,12 @@
+2026-05-17 21:29:48,913 - WARNING - USUARIO: None | IP: 192.168.1.96 | Acceso con usuario inexistente
+2026-05-17 22:08:03,863 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:08:08,500 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:08:16,969 - WARNING - USUARIO: None | IP: 192.168.1.96 | Acceso con usuario inexistente
+2026-05-17 22:08:47,055 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:08:55,298 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:08:59,577 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:09:03,567 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:09:14,614 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:09:20,993 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:09:26,027 - WARNING - USUARIO: None | IP: 192.168.1.96 | Contrasenia incorrecta
+2026-05-17 22:10:45,762 - INFO - USUARIO: Dayanara | IP: 192.168.1.96 | Éxito de inicio de sesión.

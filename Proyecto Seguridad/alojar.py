@@ -42,7 +42,7 @@ def regresar(frameAlojar, frameMenu):
     frameAlojar.pack_forget()
     frameMenu.pack(fill="both", expand=True)
 
-
+"""Crea el frame"""
 def crearFrame(ventana, frameMenu, protocolo="TCP"):
     framePrincipal = tk.Frame(ventana, bg=util.colorFondo)
     

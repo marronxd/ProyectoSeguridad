@@ -62,7 +62,7 @@ def crearFrame(ventana, frameMenu, protocolo="TCP"):
     def clickConectarse():
         ip = campoIP.get()
         puerto = campoPuerto.get()
-        nombre = "".join(logVal.USUARIO) # Lo recorre caracter por caracter hasta hacer otra vez el texto pq sino lo marca ambos como global
+        nombre = "".join(logVal.USUARIO) # Lo recorre caracter por caracter hasta hacer otra vez el texto porque sino marca ambos como global
         if not ip or not puerto: # Uno de los tres campos está vacío
             mb.showwarning("Campos vacíos", "Llene los campos solicitados")
             return
@@ -101,7 +101,6 @@ def obtener_puerto_servidor():
 def obtener_nombre_usuario():
     """Regresa el nombre de usuario proporcionado en la conexión"""
     return nombre_usuario
-
 
 """Método que valida la información proporcionada"""
 def validar(ip, puerto): # Regresa verdadero si se cumple lo siguiente

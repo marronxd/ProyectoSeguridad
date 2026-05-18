@@ -13,6 +13,7 @@ Autores:
  @author María Valdez - 262775
 """
 
+"Importaciones"
 import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
@@ -63,6 +64,7 @@ class ClienteChat:
             print(f"Error al iniciar cliente: {e}")
             raise e  # Relanzar la excepción para que la capture el llamador
 
+    """Inicia el protocolo TCP"""
     def _iniciar_tcp(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(5)
@@ -143,7 +145,8 @@ class ClienteChat:
             raise # Re-lanzamos la excepción para que el código que llamó a iniciar() la maneje.
 
 
-    """"Ignorar, solo no lo elimino pq no me quiero fregar algo"""
+    """"Actualmente no se usa en el programa, pero por temas de no querer arruinar el
+        funcionamiento, se decidió no eliminarlo."""
     def _iniciar_udp(self):
         """
         Configura el socket UDP y envía el nombre de usuario como primer mensaje.
@@ -197,14 +200,14 @@ class ClienteChat:
         try:
             while self.ejecutando: # Mientras el cliente está activo
                 try:
-                    if self.protocolo == "TCP": # Ignorar solo es pq se manejaba tcp y udp
+                    if self.protocolo == "TCP": 
                         datos = self.socket.recv(4096) # Recibe los bytes del servidor
                         if not datos:
                             util.guardar_log("Conexión cerrada por el servidor", "warning")
                             break
                         
-                        mensaje = None # Declararla por si las moscas
-                        # Intentar desencriptar
+                        mensaje = None # Por cualquier cosa, la declara
+                        # Trata de desencriptar
                         try:
                             mensaje = encriptar.desencriptar(datos, self.llave_privada)
                         except Exception as e:
@@ -219,7 +222,7 @@ class ClienteChat:
                                 continue
 
                         if mensaje:
-                            # Ahora llamamos al callback con protección adicional
+                            # Ahora llamamos al callback como protección adicional
                             try:
                                 callback(mensaje)
                             except Exception as e:
@@ -361,7 +364,7 @@ class VentanaChat:
             if len(partes) == 3:
                 destino = partes[1]
                 contenido = partes[2]
-                # Usar el nuevo método que encripta solo el contenido
+                # Usa el nuevo método que encripta solo el contenido
                 self.cliente.enviar_privado_formateado(destino, contenido)
         else:
             # Mensaje público
@@ -503,8 +506,6 @@ class VentanaChat:
 
         self.texto_mensajes.config(state=tk.DISABLED)
         self.texto_mensajes.see(tk.END)
-
-    
    
     def al_cerrar(self):
         """
@@ -517,7 +518,6 @@ class VentanaChat:
             pass
 
         self.ventana_chat.destroy()
-
 
 def iniciar_chat(ventana, ip, puerto, nombre, protocolo):
     """

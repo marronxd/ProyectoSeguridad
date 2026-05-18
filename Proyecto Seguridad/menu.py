@@ -28,9 +28,9 @@ import login_validacion as logVal
 def crearFrame(ventana):
     frameMenu = tk.Frame(ventana, bg=util.colorFondo) # Crea el contenedor principal (la pantalla) y le asigna el color de fondo
 
-    util.label(frameMenu, "Grinder", 40) # Muestra el título principal del programa
+    util.label(frameMenu, "ChatsitoApp", 40) # Muestra el título principal del programa
 
-    descripcion = f"Hola {logVal.USUARIO} bienvenido a Grinder. Explora un mundo de posibilidades Homosexuales"
+    descripcion = f"Hola, {logVal.USUARIO}! bienvenido a ChatsitoApp. Explora un mundo de comunicaciones seguras."
     util.label(frameMenu, descripcion, 15) # Muestra la descripción del programa
 
     # Frame contenedor para la etiqueta y el Combobox
@@ -50,7 +50,6 @@ def crearFrame(ventana):
     # Llama a 'conectar.mostrarFrame', pasando el protocolo seleccionado dinámicamente con 'protocolo.get()'.
     util.boton(frameMenu, "Unirse a un servidor", 
               lambda: conectar.mostrarFrame(ventana, frameMenu, protocolo.get()))
- 
     
     # Botón para crear (Servidor). Llama a 'alojar.mostrarFrame', pasando el protocolo seleccionado.
     util.boton(frameMenu, "Crear un servidor", 

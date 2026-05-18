@@ -3,7 +3,7 @@ servidorTCP.py
 
 Descripción:
 Se encarga de recibir los mensajes y ser quien dictamina a quién manda los mensajaes.
-Controla el flujo de envio de mensajes. 
+Controla el flujo de envío de mensajes. 
 Maneja reglas de negocio que el servidor tiene.
 
 Funciones principales:
@@ -61,23 +61,21 @@ Variable controladora de clientes activos en simultaneo
 CAPACIDAD_MAXIMA = 5
 usuariosActivos = 0
 
-
 # Generar par de llaves para el servidor
 llave_privada_servidor, llave_publica_servidor = encriptar.generar_llaves()
 
 """
-funcion que da inicio al servidor
+Función que da inicio al servidor
 """
 def iniciar(puerto=51225):
     global servidor # Si no se hace global, se vuelve una variable local
     servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #El servidor es un socket TCP (SOCK_STREAM) IPv4 (AF_INET)
-    servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # asigna una configuracion general al socket(socket.SOL_SOCKET), dicha config hace que otro cliente reutilice el puerto, el 1 es para activar
+    servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Asigna una configuracion general al socket(socket.SOL_SOCKET), dicha config hace que otro cliente reutilice el puerto, el 1 es para activar
     servidor.bind(("0.0.0.0", puerto)) #Se conecta: IP (localhost en este caso), puerto (51225 por el 05/12/25). Parámetro de tupla
     servidor.listen() #Espera y atiende los clientes. Tiene una lista de espera en el SO
 
 
     # Debugs solo para comprobar funcionamiento, se puede ignorar o eliminar
-
     print("DEBUG: El socket está abierto y escuchando en 0.0.0.0") 
     print(f"Servidor iniciado en puerto {puerto}")
     print("Abre varias terminales y ejecuta cliente.py")
@@ -181,7 +179,7 @@ def manejar(cliente):
         limpiar_cliente(cliente) # Llama a la escoba gg
 
 """"
-    Limpia de los registros informacion de los clientes que dejan el servidor
+    Limpia de los registros información de los clientes que dejan el servidor
     sin importar la razón. Disminuye el contador de usuarios. Elimina el socket
     de esa conexión junto con su nombre y llave pública. Además notifica al servidor
     la salida del mismo. Notifica a los demas clientes en espera que se liberó un 
@@ -196,29 +194,29 @@ def limpiar_cliente(cliente):
         if cliente in clientes: # Busca el socket en la lista de sockets
             
             # Busca el cliente (socket) y lo elimina del registro
-            # Tmb extrae el nombre
+            # También extrae el nombre
 
             indice = clientes.index(cliente) # Cuando coincide, extrae el indice
             clientes.remove(cliente) # Remueve el socket de la lista
             nombre = nombres[indice] 
            
-           # tmb elimina la llave del wey que se fue
+           # También elimina la llave del wey que se fue
 
-            if nombre in llaves_publicas: # Con el nombre tmb elimina su llave, como el dueño del balón en las retas
-                del llaves_publicas[nombre] # Borra la llave gg
+            if nombre in llaves_publicas: # Cuando se lleva el nombre, se elimina su llave
+                del llaves_publicas[nombre] # Borra la llave 
             cliente.close() # Cierra el socket y libera recursos
             
-            # Recorre los nombres y tmb elimina el nombre del q se fue
+            # Recorre los nombres y también elimina el nombre del cliente que se fue
 
             if nombre in nombres:
                 nombres.remove(nombre)
-            transmitir_a_todos(f"{nombre} dejó el chat", nombre) # avisa al chat
+            transmitir_a_todos(f"{nombre} dejó el chat", nombre) # Avisa al chat
             usuariosActivos -= 1 # Disminuye los usuarios activos
            
            # Notifica al primer hilo en la cola que se liberó un espacio
 
             with condicion:
-                condicion.notify() # este notifica
+                condicion.notify() # Notifica
    
     except Exception as e:
         util.guardar_log(f"Error al limpiar cliente: {e}", "error")
@@ -227,7 +225,7 @@ def limpiar_cliente(cliente):
 
 """
     Acepta los a los clientes al servidor y crea hilos que se asocian a cada cliente
-    Esta funcion gestiona los hilos y a su vez asigna cada hilo a un cliente, añade cada cliente
+    Esta función gestiona los hilos y a su vez asigna cada hilo a un cliente, añade cada cliente
     tanto como su nombre a registros y da avisos
 """
 
@@ -235,14 +233,14 @@ def recibir():
     global usuariosActivos, CAPACIDAD_MAXIMA
     while True:
 
-        espera_turno() # cuando entra un cliente, lo duerme si supera el max de activos
-        cliente, direccion = servidor.accept() # acepta la conexion y guarda el socket y su ip
+        espera_turno() # Cuando entra un cliente, lo duerme si supera el max de activos
+        cliente, direccion = servidor.accept() # Acepta la conexión y guarda el socket y su ip
         util.guardar_log(f"Cliente conectado desde: {direccion}", "info")
         
-        # Enviar la clave publica del servidor al cliente
+        # Enviar la clave pública del servidor al cliente
         try:
             
-            # Configura y genera la llave publica del servidor
+            # Configura y genera la llave pública del servidor
 
             llave_servidor_bytes = llave_publica_servidor.public_bytes(
                 encoding=serialization.Encoding.PEM,
@@ -251,10 +249,15 @@ def recibir():
 
             # Enviar tamaño de la llave (4 bytes) + la llave
             cliente.send(len(llave_servidor_bytes).to_bytes(4, 'big'))
-            cliente.send(llave_servidor_bytes) # Necesario para que el cliente sepa que es la llave del servidor y la lea como tal y no como un mensaje normal. El 4 es porque independientemente siempre leera esos 4 bytes primero
+            """
+            Necesario para que el cliente sepa que es la llave del servidor y la lea como tal 
+            y no como un mensaje normal. El 4 es porque independientemente siempre leerá 
+            esos 4 bytes primero.
+            """
+            cliente.send(llave_servidor_bytes) 
         except Exception as e:
             util.guardar_log(f"{e}", "error")
-            cliente.close() # cierra el socket por si acaso
+            cliente.close() # Cierra el socket por si acaso
             continue
         
         # 2.- Pedir Handshake, el nombre del cliente al usuario
@@ -263,14 +266,19 @@ def recibir():
         
         # Extraer nombre
         try:
-            if "|" in respuesta: # es por el formato del mensaje, sí, es rígido y q, se hizo este proyecto cuando éramos nubs
+            """
+            Esto estaba pensado para validar el formato del mensaje, contemplado en la
+            primera versión de este proyecto. 
+            Profe recuerde que solo 1/4 llevó Redes con usted. 
+            """
+            if "|" in respuesta: 
                 partes = respuesta.split("|", 2)
                 nombre = partes[2].strip() #sanitiza
             else:
                 nombre = respuesta.strip()
         except Exception as e:
             util.guardar_log(f"Error de extraccion de nombre: {e}", "error")
-            cliente.close() #cerrar socket
+            cliente.close() # Cerrar socket
             continue
         
         # Verificar si el nombre ya existe
@@ -286,7 +294,7 @@ def recibir():
             largo_llave_bytes = cliente.recv(4)
 
             if not largo_llave_bytes:
-                raise Exception("No se recibió el tamaño de la llave") #el raise solo lanza excepcion cuando m de la gana
+                raise Exception("No se recibió el tamaño de la llave") # El raise solo lanza excepción cuando quire
             largo_llave = int.from_bytes(largo_llave_bytes, 'big')
             
             # Recibir la llave pública
@@ -300,11 +308,11 @@ def recibir():
             cliente.close()
             continue
         
-        # agregar el cliente y su nombre a laa listas
+        # Agregar el cliente y su nombre a las listas
         nombres.append(nombre) 
         clientes.append(cliente)
 
-        # aviso de que alguien se unió
+        # Aviso de que alguien se unió
         mensaje_bienvenida = f'({util.ahora()}) SERVIDOR: {nombre} se unió al chat'
         util.guardar_log(f"Se unió al chat: {servidor}", "info")
         transmitir_a_todos(mensaje_bienvenida, nombre)
@@ -329,24 +337,21 @@ def recibir():
         except Exception as e:
             print(f"Error al enviar llaves de otros clientes: {e}")
         
-        # target indica la funcion que manejará el hilo
-        # args con quien trabajara, es decir, al cliente que se asocia
-        hilo = threading.Thread(target=manejar, args=(cliente,)) #se crea el hilo que conecta el servidor con el cliente
-        with bloqueo: # un hilo a la vez
-            usuariosActivos += 1 # modifica el contador
-        hilo.start() # empieza el hilo
-
-
-
+        # Target indica la función que manejará el hilo
+        # Args con quien trabajará, es decir, al cliente que se asocia
+        hilo = threading.Thread(target=manejar, args=(cliente,)) # Se crea el hilo que conecta el servidor con el cliente
+        with bloqueo: # Un hilo a la vez
+            usuariosActivos += 1 # Modifica el contador
+        hilo.start() # Empieza el hilo
 
 """
-Busca si nombre un nombre ya existe en el registro de nombres
-cliente es el socket
-nombre es el nombre de ese socket (o del usuario)
+Busca si un nombre ya existe en el registro de nombres.
+Cliente es el socket.
+Nombre es el nombre de ese socket (o del usuario),
 
-en caso de existir da retroalimentacion al cliente, cierra su socket
-regresa verdadero
-caso contrario, regresa falso
+En caso de existir da retroalimentacion al cliente, cierra su socket,
+Regresa verdadero.
+Caso contrario, regresa falso.
 """
 def usuario_repetido(cliente, nombre):
     if nombre in nombres:
@@ -356,11 +361,11 @@ def usuario_repetido(cliente, nombre):
     return False
 
 """
-Envía mensaje solo a un cliente en específico
-cliente es el socket
-partes es el texto que recibe (ya decodificado) separado en partes
+Envía mensaje solo a un cliente en específico.
+Cliente es el socket.
+Partes es el texto que recibe (ya decodificado) separado en partes.
 
-en caso de haber excepcion ValueError, notifica al usuario
+En caso de haber excepción ValueError, notifica al usuario.
 """
 def mensaje_privado(cliente, destino, contenido_b64):
     """
@@ -381,7 +386,7 @@ def mensaje_privado(cliente, destino, contenido_b64):
         util.guardar_log(f"No se encontró la llave del remitente {nombre_remitente}", "error")
         return
     
-    llave_remitente = serialization.load_pem_public_key(llave_remitente_bytes) # carga la llave publica del remitente
+    llave_remitente = serialization.load_pem_public_key(llave_remitente_bytes) # Carga la llave pública del remitente
     
     # Verificar si el destinatario existe
     if destino not in nombres:
@@ -400,7 +405,7 @@ def mensaje_privado(cliente, destino, contenido_b64):
     if not llave_dest_bytes:
         util.guardar_log(f"No se encontró la llave del destinatario {destino}", "error")
         return
-    llave_dest = serialization.load_pem_public_key(llave_dest_bytes) # lo mismo q ahorita pero con el destinatario
+    llave_dest = serialization.load_pem_public_key(llave_dest_bytes) # Mismo proceso pero ahora con el destinatario
     
     # Desencriptar el contenido (viene en base64)
     contenido_bytes = base64.b64decode(contenido_b64.encode(codigo))
@@ -420,24 +425,24 @@ def mensaje_privado(cliente, destino, contenido_b64):
     
 
 """
-pone al hilo en espera si este supera la capacidad maxima
+Pone al hilo en espera si este supera la capacidad máxima
 """
 def espera_turno():
-    with condicion: # controla la cola de espera
+    with condicion: # Controla la cola de espera
         if usuariosActivos >= CAPACIDAD_MAXIMA:  
-            condicion.wait() #pone el hilo a esperar
+            condicion.wait() # Pone el hilo a esperar
     return
 
 """ 
-    Usado para la comunicacion con todos los participantes del chat grupal, es decir, 
+    Usado para la comunicación con todos los participantes del chat grupal, es decir, 
     enviar mensaje a todos los clientes. Transmite el contenido del mensaje encriptado
     con la llave pública de cada destinatario para que solo él pueda leerlo.
 """
 def transmitir_a_todos(mensaje_str, remitente_nombre=None):
 
-    for i, cliente_destino in enumerate(clientes[:]): # extrae indice y socket
+    for i, cliente_destino in enumerate(clientes[:]): # Extrae índice y socket
       
-        nombre_destino = nombres[i] #extrae nombre
+        nombre_destino = nombres[i] # Extrae nombre
 
         if remitente_nombre and nombre_destino == remitente_nombre:
             continue
@@ -448,7 +453,7 @@ def transmitir_a_todos(mensaje_str, remitente_nombre=None):
 
             if llave_bytes:
                 llave_destino = serialization.load_pem_public_key(llave_bytes)
-                # en este punto mensaje_str ya es string, no hay que decodificar
+                # En este punto mensaje_str ya es String, no hay que decodificar
                 mensaje_encriptado = encriptar.encriptar(mensaje_str, llave_destino)
                 cliente_destino.send(mensaje_encriptado)
 

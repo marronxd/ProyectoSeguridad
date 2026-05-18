@@ -1,3 +1,4 @@
+"""Importaciones"""
 import hashlib as hash
 import re  # regex
 import utilerias as util
@@ -37,25 +38,23 @@ def validar_identidad (usuario, contrasenia):
         util.guardar_log("Acceso con usuario inexistente", "warning")
         return False
 
-    # hashear contraseña para comparar con los registros locales
+    # Hashear contraseña para comparar con los registros locales
     contrasenia_hasheada = hash.sha256(contrasenia.encode()).hexdigest()
 
-    # devuelve true si coincide
+    # Devuelve true si coincide
     if usuarios[usuario] == contrasenia_hasheada:
         USUARIO = usuario
         return True
     util.guardar_log("Contrasenia incorrecta", "warning")
 
 
-
-
-# se añadira para registrar usuario
+# Se añadirá para registrar usuario
 """ función para validar el formato de la contraseña"""
 def validar_formato(contrasenia):
-    # patron que debe seguir la contrasenia
+    # Patrón que debe seguir la contrasenia
     patron = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
 
-    # si el patron concuerda
+    # Si el patron concuerda
     if re.match(patron, contrasenia):
         return True
     return False

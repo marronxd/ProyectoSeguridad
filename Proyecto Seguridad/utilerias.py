@@ -28,8 +28,6 @@ import logging as log
 import login_validacion as logVal
 
 
-
-
 """Regresa un string con la fecha y hora"""
 def ahora():
     return dt.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -150,15 +148,14 @@ def pedirNombreChat(nombreUsuario):
 
 
 
-""" Configuracion inicial de un log """
-
+""" Configuración inicial de un log """
 log.basicConfig(level= log.INFO,
                 format='%(asctime)s - %(levelname)s - %(message)s',
                 filename='Logs.txt',
                 filemode='a'
                 )
 
-""" Metodo reutilizable para mandar logs"""
+""" Método reutilizable para mandar logs"""
 def guardar_log(mensaje, tipo):
     # sanitizar
     tipo = str(tipo).lower().strip()

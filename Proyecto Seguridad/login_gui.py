@@ -1,3 +1,4 @@
+"""Importaciones"""
 import tkinter as tk
 from tkinter import messagebox
 import menu #Pantalla de menú principal
@@ -6,7 +7,6 @@ import login_validacion as loginVal
 
 """
 Almacen de usuarios
-
 
 Autores:
  @author Aaron Burciaga - 262788
@@ -17,11 +17,10 @@ Autores:
 
 """
 Crear el frame tipo dialogo que muestra el inicio de sesion
-
 """
 
 def abrirLogin(ventana, exito):
-   # Creacion de la ventana de diálogo (Toplevel)
+   # Creación de la ventana de diálogo (Toplevel)
     ventana_login = tk.Toplevel(ventana)
     
     # Configurar el título
@@ -39,22 +38,20 @@ def abrirLogin(ventana, exito):
 
     # --- Elementos de la interfaz ---
     
-    # para el campo nombre/user
+    # Para el campo nombre/user
     tk.Label(ventana_login, text="Usuario:").pack(pady=(20, 0))
     entrada_user = tk.Entry(ventana_login)
     entrada_user.pack(pady=5)
     
-    # para el campo de contraseña
+    # Para el campo de contraseña
     tk.Label(ventana_login, text="Contraseña:").pack(pady=(10, 0))
-    entrada_contra = tk.Entry(ventana_login, show="*") # show="*" para no mostrar la contrasenia
+    entrada_contra = tk.Entry(ventana_login, show="*") # show="*" <- Esto es para que no se muestra la contraseña
     entrada_contra.pack(pady=5)
     
-    ventana_login.protocol("WM_DELETE_WINDOW", ventana.destroy) # si se le da a la x, cierra todo el programa
-
+    ventana_login.protocol("WM_DELETE_WINDOW", ventana.destroy) # Significa que si se selecciona X, se cierra todo el programa
 
     """
     Función que llama a un auxiliar para validar la identidad.
-
     """
     def validar():
 
@@ -65,7 +62,7 @@ def abrirLogin(ventana, exito):
         # Verifica las entradas
         if loginVal.validar_identidad(usuario, contrasenia):
             util.guardar_log("Éxito de inicio de sesión.", "info")
-            # Se destruye el login  y se avisa que fue un exito el inicio de sesión.
+            # Se destruye el login y se avisa que fue un éxito el inicio de sesión.
             ventana_login.destroy()
             exito()
         else: 

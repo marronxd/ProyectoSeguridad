@@ -31,7 +31,7 @@ def generar_llaves():
     llave_publica = llave_privada.public_key()
     return llave_privada, llave_publica
 
-"""Encripta para envio. Requiere la llave publica para poder descifrar el mensaje"""
+"""Encripta para envío. Requiere la llave publica para poder descifrar el mensaje"""
 
 def encriptar(mensaje, llave_publica_receptor):
     return llave_publica_receptor.encrypt(
